@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
-const Child = require("../models/child");
+
 //get all users
 router.get("/", async (req, res) => {
   try {
@@ -53,8 +53,7 @@ router.put("/:id", async (req, res) => {
   const updatedFields = {
     firstName,
     lastName,
-    email,
-    children
+    email
   };
   if (password) {
     updatedFields.password = password;
@@ -64,6 +63,30 @@ router.put("/:id", async (req, res) => {
       { _id: req.params.id },
       {
         $set: updatedFields,
+      }
+    );
+    if (user === null) {
+      return res.status(404).json({ message: "Cant find subscriber" });
+    }
+    res.status(200).send(user);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
+//update children
+
+router.put("update-children/:id", async (req, res) => {
+  const { children } = req.body;
+  const updatedFields = {
+    children
+  };
+  
+  try {
+    const user = await User.updateOne(
+      { _id: req.params.id },
+      {
+        $set: req.body
       }
     );
     if (user === null) {

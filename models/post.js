@@ -6,7 +6,7 @@ const postSchema = new mongoose.Schema({
   ratings: { type: Number, min: 1, max: 5 },
   created: { type: Date, default: Date.now },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  childId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  childId: { type: mongoose.Schema.Types.ObjectId, ref: "Child" },
 
 });
 

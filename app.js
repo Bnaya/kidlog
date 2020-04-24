@@ -6,7 +6,7 @@ const app = express();
 
 const postsRouter = require("./routes/posts");
 const usersRouter = require("./routes/users");
-const childrenRouter = require('./routes/children');
+
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -15,7 +15,7 @@ morganBody(app);
 
 app.use("/posts", postsRouter);
 app.use("/users", usersRouter);
-// app.use('/users', childrenRouter);
+
 
 const mongoose = require("mongoose");
 mongoose.set("useUnifiedTopology", true);
