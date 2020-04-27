@@ -1,8 +1,27 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/post");
+const { check, validationResult } = require("express-validator");
 
+//Async Handles to retreive data async
+function asyncHandler(cb) {
+  return async (req, res, next) => {
+    try {
+      await cb(req, res, next);
+    } catch (err) {
+      next(err);
+    }
+  };
+};
 
+const postValidation = [
+  check("desc")
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "description"'),
+  check("lessonNum")
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "lesson number"'),
+];
 
 //get all posts
 router.get("/", async (req, res) => {
@@ -28,7 +47,8 @@ router.get("/:id", async (req, res) => {
 });
 
 // create a new post
-router.post("/", async (req, res) => {
+router.post("/", postValidation, asyncHandler(async (req, res) => {
+   const errors = validationResult(req);
   const post = new Post({
     desc: req.body.desc,
     lessonNum: req.body.lessonNum,
@@ -38,34 +58,50 @@ router.post("/", async (req, res) => {
   });
 
   try {
-    const newPost = await post.save();
-    res.status(201).json(newPost);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      return res.status(422).json({ errors: errorMessages });
+    } else {
+
+      const newPost = await post.save();
+     return res.status(201).json(newPost);
+    }
   } catch (err) {
-    res.status(400).json({ message: err.message });
+   return res.status(400).json({ message: err.message });
   }
-});
+}));
 
 //update a post
-router.put("/:id", async (req, res) => {
-  const updatedFields = { desc, lessonNum, ratings, childId } = req.body;
-  if (childId) {
-    updatedFields.childId = childId;
-  }
-  try {
-    const post = await Post.updateOne(
-      { _id: req.params.id },
-      {
-        $set: updatedFields,
-      }
-    );
-    if (post === null) {
-      return res.status(404).json({ message: "Cant find subscriber" });
+router.put(
+  "/:id",
+  postValidation,
+  asyncHandler(async (req, res) => {
+    const updatedFields = ({ desc, lessonNum, ratings, childId } = req.body);
+    const errors = validationResult(req);
+    if (childId) {
+      updatedFields.childId = childId;
     }
-    res.status(200).json(post);
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-});
+    try {
+      if (!errors.isEmpty()) {
+        const errorMessages = errors.array().map((error) => error.msg);
+        return res.status(422).json({ errors: errorMessages });
+      } else {
+        const post = await Post.updateOne(
+          { _id: req.params.id },
+          {
+            $set: updatedFields,
+          }
+        );
+        if (post === null) {
+          return res.status(404).json({ message: "Cant find subscriber" });
+        }
+       return res.status(200).json(post);
+      }
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  })
+);
 
 //delete a post
 router.delete("/:id", async (req, res) => {
