@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 });
 
 //get a single post
-router.get("/single/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post === null) {
@@ -46,17 +46,16 @@ router.post("/", async (req, res) => {
 });
 
 //update a post
-router.put("/single/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
+  const updatedFields = { desc, lessonNum, ratings, childId } = req.body;
+  if (childId) {
+    updatedFields.childId = childId;
+  }
   try {
     const post = await Post.updateOne(
       { _id: req.params.id },
       {
-        $set: {
-          desc: req.body.desc,
-          lessonNum: req.body.lessonNum,
-          ratings: req.body.ratings,
-          childId: req.body.childId
-        },
+        $set: updatedFields,
       }
     );
     if (post === null) {
@@ -69,7 +68,7 @@ router.put("/single/:id", async (req, res) => {
 });
 
 //delete a post
-router.delete("/single/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const post = await Post.findOneAndDelete({ _id: req.params.id });
     if (post === null) {

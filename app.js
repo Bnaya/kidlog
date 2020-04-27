@@ -2,11 +2,11 @@ require("dotenv").config();
 const morganBody = require('morgan-body');
 const express = require("express");
 const app = express();
+const { check, validationResult } = require("express-validator");
 
 
 const postsRouter = require("./routes/posts");
 const usersRouter = require("./routes/users");
-
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -16,6 +16,26 @@ morganBody(app);
 app.use("/posts", postsRouter);
 app.use("/users", usersRouter);
 
+
+
+//*****GENERAL ROUTEES*****
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to the Kidlog project!'
+  });
+});
+
+//Catch all routes to serve the index.html file from the client build folder
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../client/build/index.html'));
+// });
+
+// send 404 if no other route matched
+app.use((req, res) => {
+  res.status(404).json({
+    message: 'Route Not Found'
+  });
+});
 
 const mongoose = require("mongoose");
 mongoose.set("useUnifiedTopology", true);
