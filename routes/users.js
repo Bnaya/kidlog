@@ -193,7 +193,7 @@ router.post(
         const errorMessages = errors.array().map((error) => error.msg);
         return res.status(400).json({ errors: errorMessages });
       } else {
-         user = await User.updateOne(
+        user = await User.updateOne(
           { _id: req.params.id },
           { $push: { children: newChild } }
         );
@@ -229,28 +229,39 @@ router.get("/child/:childId", async (req, res) => {
 
 //update child
 
-router.put("/update-child/:childId", async (req, res) => {
-  const { name, birthYear, gender } = req.body;
-  const updatedFields = {
-    "children.$.name": name,
-    "children.$.birthYear": birthYear,
-    "children.$.gender": gender,
-  };
+router.put(
+  "/update-child/:childId",
+  childValidation,
+  asyncHandler(async (req, res) => {
+    const { name, birthYear, gender } = req.body;
+    const errors = validationResult(req);
+    const updatedFields = {
+      "children.$.name": name,
+      "children.$.birthYear": birthYear,
+      "children.$.gender": gender,
+    };
 
-  try {
-    const usersChildren = await User.updateOne(
-      { "children._id": req.params.childId },
-      {
-        $set: updatedFields,
+    try {
+      let usersChildren;
+      if (!errors.isEmpty()) {
+        const errorMessages = errors.array().map((error) => error.msg);
+        return res.status(400).json({ errors: errorMessages });
+      } else {
+         usersChildren = await User.updateOne(
+          { "children._id": req.params.childId },
+          {
+            $set: updatedFields,
+          }
+        );
+        if (usersChildren === null) {
+          return res.status(404).json({ message: "Cant find subscriber" });
+        }
       }
-    );
-    if (usersChildren === null) {
-      return res.status(404).json({ message: "Cant find subscriber" });
+      return res.status(200).send(usersChildren);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
     }
-    res.status(200).send(usersChildren);
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-});
+  })
+);
 
 module.exports = router;
