@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
-const bcrypt = require("bcryptjs");
+const bcryptjs = require("bcryptjs");
 const { check, validationResult } = require("express-validator");
+const auth = require("basic-auth");
 
 //Async Handles to retreive data async
 function asyncHandler(cb) {
@@ -14,6 +15,42 @@ function asyncHandler(cb) {
     }
   };
 }
+//AUTHENTICATE USER
+const authenicateUser = asyncHandler(async (req, res, next) => {
+  let message = null;
+
+  const credentials = auth(req);
+
+  if (credentials) {
+    
+    const user = await User.findOne({
+      email: credentials.name,
+    });
+
+    if (user) {
+      const authenticated = bcryptjs.compareSync(
+        credentials.pass,
+        user.password
+      );
+
+      if (authenticated) {
+        req.currentUser = user;
+      } else {
+        message = `Authentication failure for email: ${user.email}`;
+      }
+    } else {
+      message = `Authentication found for email ${credentials.name}`;
+    }
+  } else {
+    message = `Auth header not found`;
+  }
+  if (message) {
+    console.warn(message);
+    res.status(401).json({ message: `Access Denied` });
+  } else {
+    next();
+  }
+});
 //*****Validations*****
 
 const userValidation = [
@@ -34,13 +71,11 @@ const userValidation = [
     .withMessage('Please  provide a value for "passowrd'),
 ];
 
-
-
 //get all users only for the production
 router.get("/", async (req, res) => {
   try {
     const users = await User.find();
-    return res.send(users);
+    return res.send({ status: "success",results: users.length,  data: users});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -53,7 +88,7 @@ router.get("/:id", async (req, res) => {
     if (user === null) {
       return res.status(404).json({ message: "Cant find subscriber" });
     }
-    res.status(200).send(user);
+    res.status(200).send({ status: "success", data: user });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -77,7 +112,7 @@ router.post(
           .status(400)
           .json({ message: "email address already exists" });
       } else {
-        const hash = await bcrypt.hash(password, 10);
+        const hash = await bcryptjs.hash(password, 10);
         const user = new User({
           firstName,
           lastName,
@@ -104,7 +139,7 @@ router.post("/sign-in", async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "Authentication failed" });
     }
-    const password = await bcrypt.compare(req.body.password, user.password);
+    const password = await bcryptjs.compare(req.body.password, user.password);
     if (!password) {
       return res.status(401).json({ message: "Authentication failed" });
     }
@@ -112,7 +147,7 @@ router.post("/sign-in", async (req, res, next) => {
     if (user === null) {
       return res.status(404).json({ message: "Cant find subscriber" });
     }
-    res.status(200).send(user);
+   return res.status(200).send(user);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }

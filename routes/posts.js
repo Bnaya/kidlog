@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Post = require("../models/post");
 const { check, validationResult } = require("express-validator");
+const authenicateUser = require("./users");
 
 //Async Handles to retreive data async
 function asyncHandler(cb) {
@@ -12,7 +13,7 @@ function asyncHandler(cb) {
       next(err);
     }
   };
-};
+}
 
 const postValidation = [
   check("desc")
@@ -24,14 +25,19 @@ const postValidation = [
 ];
 
 //get all posts
-router.get("/", async (req, res) => {
-  try {
-    const posts = await Post.find();
-    res.json(posts);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+router.get(
+  "/",
+
+  asyncHandler(async (req, res) => {
+    try {
+      const posts = await Post.find();
+      // return res.json(posts);
+      return res.json({status: 'success', results: posts.length, data: posts})
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  })
+);
 
 //get a single post
 router.get("/:id", async (req, res) => {
@@ -40,36 +46,42 @@ router.get("/:id", async (req, res) => {
     if (post === null) {
       return res.status(404).json({ message: "Cant find posts" });
     }
-    res.status(200).json(post);
+    res
+      .status(200)
+      .json({ status: "success",  data: post });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 });
 
 // create a new post
-router.post("/", postValidation, asyncHandler(async (req, res) => {
-   const errors = validationResult(req);
-  const post = new Post({
-    desc: req.body.desc,
-    lessonNum: req.body.lessonNum,
-    ratings: req.body.ratings,
-    childId: req.body.childId,
-    userId: req.body.userId
-  });
+router.post(
+  "/",
+  postValidation,
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    const { desc, lessonNum, ratings, childId, userId } = req.body;
+    const post = new Post({
+      desc,
+      lessonNum,
+      ratings,
+      childId,
+      userId,
+    });
 
-  try {
-    if (!errors.isEmpty()) {
-      const errorMessages = errors.array().map((error) => error.msg);
-      return res.status(422).json({ errors: errorMessages });
-    } else {
-
-      const newPost = await post.save();
-     return res.status(201).json(newPost);
+    try {
+      if (!errors.isEmpty()) {
+        const errorMessages = errors.array().map((error) => error.msg);
+        return res.status(422).json({ errors: errorMessages });
+      } else {
+        const newPost = await post.save();
+        return res.status(201).json({ status: "success", data: newPost});
+      }
+    } catch (err) {
+      return res.status(400).json({ message: err.message });
     }
-  } catch (err) {
-   return res.status(400).json({ message: err.message });
-  }
-}));
+  })
+);
 
 //update a post
 router.put(
@@ -95,7 +107,7 @@ router.put(
         if (post === null) {
           return res.status(404).json({ message: "Cant find subscriber" });
         }
-       return res.status(200).json(post);
+        return res.status(200).json({ status: "success", data: post });
       }
     } catch (err) {
       return res.status(500).json({ message: err.message });

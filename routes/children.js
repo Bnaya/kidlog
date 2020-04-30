@@ -32,9 +32,11 @@ const childValidation = [
 //*****ROUTES*****
 
 //get child
-router.get("/child/:childId", async (req, res) => {
+router.get("/children/:childId", async (req, res) => {
   try {
+    
     const child = await User.find(
+     
       { children: { $elemMatch: { _id: req.params.childId } } },
       { "children.$": 1 }
     );
@@ -42,7 +44,7 @@ router.get("/child/:childId", async (req, res) => {
     if (child === null) {
       return res.status(404).json({ message: "Cant find child" });
     }
-    return res.status(200).send(child);
+    return res.status(200).json({ status: "success", data: child });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -51,7 +53,7 @@ router.get("/child/:childId", async (req, res) => {
 //add child  add in the future with session and cookie
 
 router.post(
-  "/add-child/:id",
+  "/:id/children",
   childValidation,
   asyncHandler(async (req, res) => {
     const { name, birthYear, gender } = req.body;
@@ -78,7 +80,7 @@ router.post(
         }
       }
 
-      return res.status(200).send(user);
+      return res.status(200).json({status: 'success', data: user});
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }
@@ -90,7 +92,7 @@ router.post(
 //update child
 
 router.put(
-  "/update-child/:childId",
+  "/:childId",
   childValidation,
   asyncHandler(async (req, res) => {
     const { name, birthYear, gender } = req.body;
