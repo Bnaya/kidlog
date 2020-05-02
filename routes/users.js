@@ -69,19 +69,21 @@ const userValidation = [
     .isLength({ min: 5 })
     .withMessage('Please  provide a value for "passowrd'),
 ];
-
-//get all users only for the production
-router.get('/', async (req, res) => {
+// RESPONSES AND REQUESTS FUNCTIONS
+const getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    return res.send({ status: 'success', results: users.length, data: users });
+    return res.send({
+      status: 'success',
+      results: users.length,
+      data: users,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});
+};
 
-//get a single user for account
-router.get('/:id', async (req, res) => {
+const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (user === null) {
@@ -91,48 +93,39 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
-});
+};
 
-// create a new user
-router.post(
-  '/sign-up',
-  userValidation,
-  asyncHandler(async (req, res) => {
-    const errors = validationResult(req);
-    const { firstName, lastName, email, password, children } = req.body;
-    const checkIfUserExist = await User.findOne({ email: email });
+const createUser = async (req, res) => {
+  const errors = validationResult(req);
+  const { firstName, lastName, email, password, children } = req.body;
+  const checkIfUserExist = await User.findOne({ email: email });
 
-    try {
-      if (!errors.isEmpty()) {
-        const errorMessages = errors.array().map((error) => error.msg);
-        return res.status(422).json({ errors: errorMessages });
-      } else if (checkIfUserExist) {
-        return res
-          .status(400)
-          .json({ message: 'email address already exists' });
-      } else {
-        const hash = await bcryptjs.hash(password, 10);
-        const user = new User({
-          firstName,
-          lastName,
-          email,
-          password: hash,
-          children,
-        });
-        console.log(user);
-        const newUser = await user.save();
+  try {
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      return res.status(422).json({ errors: errorMessages });
+    } else if (checkIfUserExist) {
+      return res.status(400).json({ message: 'email address already exists' });
+    } else {
+      const hash = await bcryptjs.hash(password, 10);
+      const user = new User({
+        firstName,
+        lastName,
+        email,
+        password: hash,
+        children,
+      });
+    
+      const newUser = await user.save();
 
-        return res.status(201).send(newUser).end();
-      }
-    } catch (err) {
-      return res.status(400).json({ message: err.message });
+      return res.status(201).send(newUser).end();
     }
-  })
-);
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
 
-//user sign-in
-
-router.post('/sign-in', async (req, res, next) => {
+const userSignin = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
@@ -150,52 +143,65 @@ router.post('/sign-in', async (req, res, next) => {
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
-});
+};
+
+const updateUser = async (req, res) => {
+  const errors = validationResult(req);
+  const { firstName, lastName, email, password } = req.body;
+  const checkIfEmailExist = await User.findOne({
+    $and: [{ _id: { $ne: req.params.id } }, { email: email }],
+  });
+  const hash = await bcryptjs.hash(password, 10);
+  const updatedFields = {
+    firstName,
+    lastName,
+    email,
+  };
+  if (password) {
+    updatedFields.password = hash;
+  }
+
+  try {
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      return res.status(400).json({ errors: errorMessages });
+    } else if (checkIfEmailExist) {
+      return res
+        .status(400)
+        .json({ message: 'email address already exists with other user' });
+    } else {
+      const user = await User.updateOne(
+        { _id: req.params.id },
+        {
+          $set: updatedFields,
+        }
+      );
+      if (user === null) {
+        return res.status(404).json({ message: 'Cant find subscriber' });
+      }
+      return res.status(200).send(user);
+    }
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+//****ROUTES  */
+
+//get all users only for the production
+router.get('/', getUsers);
+
+//get a single user for account
+router.get('/:id', getUser);
+
+// create a new user
+router.post('/sign-up', userValidation, createUser);
+
+//user sign-in
+
+router.post('/sign-in', userSignin);
 
 //update a user
-router.put(
-  '/:id',
-  userValidation,
-  asyncHandler(async (req, res) => {
-    const errors = validationResult(req);
-    const { firstName, lastName, email, password } = req.body;
-    const checkIfEmailExist = await User.findOne({
-      $and: [{ _id: { $ne: req.params.id } }, { email: email }],
-    });
-    const hash = await bcrypt.hash(password, 10);
-    const updatedFields = {
-      firstName,
-      lastName,
-      email,
-    };
-    if (password) {
-      updatedFields.password = hash;
-    }
-
-    try {
-      if (!errors.isEmpty()) {
-        const errorMessages = errors.array().map((error) => error.msg);
-        return res.status(400).json({ errors: errorMessages });
-      } else if (checkIfEmailExist) {
-        return res
-          .status(400)
-          .json({ message: 'email address already exists with other user' });
-      } else {
-        const user = await User.updateOne(
-          { _id: req.params.id },
-          {
-            $set: updatedFields,
-          }
-        );
-        if (user === null) {
-          return res.status(404).json({ message: 'Cant find subscriber' });
-        }
-        return res.status(200).send(user);
-      }
-    } catch (err) {
-      return res.status(500).json({ message: err.message });
-    }
-  })
-);
+router.put('/:id', userValidation, asyncHandler(updateUser));
 
 module.exports = router;
