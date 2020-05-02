@@ -1,8 +1,8 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const Post = require("../models/post");
-const { check, validationResult } = require("express-validator");
-const authenicateUser = require("./users");
+const Post = require('../models/post');
+const { check, validationResult } = require('express-validator');
+const authenicateUser = require('./users');
 
 //Async Handles to retreive data async
 function asyncHandler(cb) {
@@ -16,23 +16,27 @@ function asyncHandler(cb) {
 }
 
 const postValidation = [
-  check("desc")
+  check('desc')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "description"'),
-  check("lessonNum")
+  check('lessonNum')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "lesson number"'),
 ];
 
 //get all posts
 router.get(
-  "/",
+  '/',
 
   asyncHandler(async (req, res) => {
     try {
       const posts = await Post.find();
       // return res.json(posts);
-      return res.json({status: 'success', results: posts.length, data: posts})
+      return res.json({
+        status: 'success',
+        results: posts.length,
+        data: posts,
+      });
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }
@@ -40,15 +44,13 @@ router.get(
 );
 
 //get a single post
-router.get("/:id", async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post === null) {
-      return res.status(404).json({ message: "Cant find posts" });
+      return res.status(404).json({ message: 'Cant find posts' });
     }
-    res
-      .status(200)
-      .json({ status: "success",  data: post });
+    res.status(200).json({ status: 'success', data: post });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -56,7 +58,7 @@ router.get("/:id", async (req, res) => {
 
 // create a new post
 router.post(
-  "/",
+  '/',
   postValidation,
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -75,7 +77,7 @@ router.post(
         return res.status(422).json({ errors: errorMessages });
       } else {
         const newPost = await post.save();
-        return res.status(201).json({ status: "success", data: newPost});
+        return res.status(201).json({ status: 'success', data: newPost });
       }
     } catch (err) {
       return res.status(400).json({ message: err.message });
@@ -85,7 +87,7 @@ router.post(
 
 //update a post
 router.put(
-  "/:id",
+  '/:id',
   postValidation,
   asyncHandler(async (req, res) => {
     const updatedFields = ({ desc, lessonNum, ratings, childId } = req.body);
@@ -105,9 +107,9 @@ router.put(
           }
         );
         if (post === null) {
-          return res.status(404).json({ message: "Cant find subscriber" });
+          return res.status(404).json({ message: 'Cant find subscriber' });
         }
-        return res.status(200).json({ status: "success", data: post });
+        return res.status(200).json({ status: 'success', data: post });
       }
     } catch (err) {
       return res.status(500).json({ message: err.message });
@@ -116,13 +118,13 @@ router.put(
 );
 
 //delete a post
-router.delete("/:id", async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     const post = await Post.findOneAndDelete({ _id: req.params.id });
     if (post === null) {
-      return res.status(404).json({ message: "Cant find subscriber" });
+      return res.status(404).json({ message: 'Cant find subscriber' });
     }
-    res.status(204).json({ message: "post deleted successfully" });
+    res.status(204).json({ status: 'sucess', data: null });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }

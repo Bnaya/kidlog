@@ -1,29 +1,27 @@
-require("dotenv").config();
+require('dotenv').config();
 const morganBody = require('morgan-body');
-const express = require("express");
+const express = require('express');
 const app = express();
-const { check, validationResult } = require("express-validator");
+const { check, validationResult } = require('express-validator');
 
-
-const postsRouter = require("./routes/posts");
-const usersRouter = require("./routes/users");
+const postsRouter = require('./routes/posts');
+const usersRouter = require('./routes/users');
 const childrenRouter = require('./routes/children');
 
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+const bodyParser = require('body-parser');
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+app.use(express.json());
 morganBody(app);
 
-app.use("/posts", postsRouter);
-app.use("/users", usersRouter);
-app.use("/users", childrenRouter);
-
-
+app.use('/posts', postsRouter);
+app.use('/users', usersRouter);
+app.use('/users', childrenRouter);
 
 //*****GENERAL ROUTEES*****
 app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to the Kidlog project!'
+    message: 'Welcome to the Kidlog project!',
   });
 });
 
@@ -35,23 +33,21 @@ app.get('/', (req, res) => {
 // send 404 if no other route matched
 app.use((req, res) => {
   res.status(404).json({
-    message: 'Route Not Found'
+    message: 'Route Not Found',
   });
 });
 
-const mongoose = require("mongoose");
-mongoose.set("useUnifiedTopology", true);
+const mongoose = require('mongoose');
+mongoose.set('useUnifiedTopology', true);
 
 const db = mongoose.connection;
-db.on("error", (error) => console.error(error));
-db.once("open", () => console.log("connected to database"));
-
-
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.log('connected to database'));
 
 app.use(express.json());
 
 app.use((req, res, next) => {
-  res.status(404).send("page not found");
+  res.status(404).send('page not found');
 });
 
 mongoose.connect(
@@ -59,6 +55,6 @@ mongoose.connect(
   { useNewUrlParser: true },
 
   () => {
-    app.listen(3003, () => console.log("server started"));
+    app.listen(3003, () => console.log('server started'));
   }
 );

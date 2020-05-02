@@ -1,8 +1,7 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const User = require("../models/user");
-const { check, validationResult } = require("express-validator");
-
+const User = require('../models/user');
+const { check, validationResult } = require('express-validator');
 
 //Async Handles to retreive data async
 function asyncHandler(cb) {
@@ -18,13 +17,13 @@ function asyncHandler(cb) {
 //*****VALIDATIONS*****
 
 const childValidation = [
-  check("name")
+  check('name')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "name"'),
-  check("birthYear")
+  check('birthYear')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "birth year"'),
-  check("gender")
+  check('gender')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "gender"'),
 ];
@@ -32,19 +31,17 @@ const childValidation = [
 //*****ROUTES*****
 
 //get child
-router.get("/children/:childId", async (req, res) => {
+router.get('/children/:childId', async (req, res) => {
   try {
-    
     const child = await User.find(
-     
       { children: { $elemMatch: { _id: req.params.childId } } },
-      { "children.$": 1 }
+      { 'children.$': 1 }
     );
 
     if (child === null) {
-      return res.status(404).json({ message: "Cant find child" });
+      return res.status(404).json({ message: 'Cant find child' });
     }
-    return res.status(200).json({ status: "success", data: child });
+    return res.status(200).json({ status: 'success', data: child });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -53,7 +50,7 @@ router.get("/children/:childId", async (req, res) => {
 //add child  add in the future with session and cookie
 
 router.post(
-  "/:id/children",
+  '/:id/children',
   childValidation,
   asyncHandler(async (req, res) => {
     const { name, birthYear, gender } = req.body;
@@ -76,31 +73,29 @@ router.post(
         );
 
         if (user === null) {
-          return res.status(404).json({ message: "Cant find user" });
+          return res.status(404).json({ message: 'Cant find user' });
         }
       }
 
-      return res.status(200).json({status: 'success', data: user});
+      return res.status(200).json({ status: 'success', data: user });
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }
   })
 );
 
-
-
 //update child
 
 router.put(
-  "/:childId",
+  '/:childId',
   childValidation,
   asyncHandler(async (req, res) => {
     const { name, birthYear, gender } = req.body;
     const errors = validationResult(req);
     const updatedFields = {
-      "children.$.name": name,
-      "children.$.birthYear": birthYear,
-      "children.$.gender": gender,
+      'children.$.name': name,
+      'children.$.birthYear': birthYear,
+      'children.$.gender': gender,
     };
 
     try {
@@ -109,14 +104,14 @@ router.put(
         const errorMessages = errors.array().map((error) => error.msg);
         return res.status(400).json({ errors: errorMessages });
       } else {
-         usersChildren = await User.updateOne(
-          { "children._id": req.params.childId },
+        usersChildren = await User.updateOne(
+          { 'children._id': req.params.childId },
           {
             $set: updatedFields,
           }
         );
         if (usersChildren === null) {
-          return res.status(404).json({ message: "Cant find subscriber" });
+          return res.status(404).json({ message: 'Cant find subscriber' });
         }
       }
       return res.status(200).send(usersChildren);
