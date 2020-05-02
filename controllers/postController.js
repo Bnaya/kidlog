@@ -1,6 +1,7 @@
 const Post = require('../models/post');
 const { check, validationResult } = require('express-validator');
 
+//****HELPER FUNCTIONS */
 
 //****ASYCN HANDLER */
 function asyncHandler(cb) {
@@ -11,6 +12,14 @@ function asyncHandler(cb) {
       next(err);
     }
   };
+}
+
+const checkData =  (data, res, req) => {
+  if (data === null) {
+    return res.status(404).json({ message: `Cant find ${req}` });
+  } else {
+    res.status(200).json({ status: 'success', data: data });
+  }
 }
 
 //***** POST VALIDATION  */
@@ -41,10 +50,8 @@ exports.getPosts = async (req, res) => {
 exports.getPost = asyncHandler(async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (post === null) {
-      return res.status(404).json({ message: 'Cant find posts' });
-    }
-    res.status(200).json({ status: 'success', data: post });
+    checkData(post, res, req.params.id);
+        
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -89,9 +96,7 @@ exports.updatePost = asyncHandler (async (req, res) => {
         $set: updatedFields,
       }
     );
-    if (post === null) {
-      return res.status(404).json({ message: 'Cant find post' });
-    }
+   
     return res.status(200).json({ status: 'success', data: post });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -100,11 +105,9 @@ exports.updatePost = asyncHandler (async (req, res) => {
 
 exports.deletePost = async (req, res) => {
   try {
-    const post = await Post.findOneAndDelete({ _id: req.params.id });
-    if (post === null) {
-      return res.status(404).json({ message: 'Cant find post' });
-    }
-    res.status(204).json({ status: 'sucess', data: null });
+     await Post.findOneAndDelete({ _id: req.params.id });
+    
+    res.status(204).json({ status: 'success', data: null });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }

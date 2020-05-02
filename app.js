@@ -1,10 +1,6 @@
 const express = require('express');
-const morganBody = require('morgan-body');
 const app = express();
-
-const mongoose = require('mongoose');
-require('dotenv').config();
-const db = mongoose.connection;
+const morganBody = require('morgan-body');
 
 const postsRouter = require('./routes/posts');
 const usersRouter = require('./routes/users');
@@ -28,26 +24,10 @@ app.use('/users', childrenRouter);
 
 // send 404 if no other route matched
 app.use((req, res) => {
-  res.status(404).json({
+ return res.status(404).json({
     message: 'Route Not Found',
   });
 });
 
-mongoose.set('useUnifiedTopology', true);
-db.on('error', (error) => console.error(error));
-db.once('open', () => console.log('connected to database'));
 
-
-
-app.use((req, res, next) => {
-  res.status(404).send('page not found');
-});
-
-mongoose.connect(
-  process.env.DATABASE_URL,
-  { useNewUrlParser: true },
-
-  () => {
-    app.listen(3003, () => console.log('server started'));
-  }
-);
+module.exports = app;

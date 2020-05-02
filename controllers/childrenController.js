@@ -25,16 +25,15 @@ exports.childValidation = [
 ];
 
 exports.getChild = async (req, res) => {
+
   try {
-    const child = await User.find(
+     const child = await User.find(
       { children: { $elemMatch: { _id: req.params.childId } } },
       { 'children.$': 1 }
     );
 
-    if (child === null) {
-      return res.status(404).json({ message: 'Cant find child' });
-    }
-    return res.status(200).json({ status: 'success', data: child });
+      return res.status(200).json({ status: 'success', data: child });
+    
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -58,10 +57,7 @@ exports.createChild = asyncHandler (async (req, res) => {
       { $push: { children: newChild } }
     );
 
-    if (user === null) {
-      return res.status(404).json({ message: 'Cant find user' });
-    }
-    //data should brind the user complete
+        //data should brind the user complete
     return res.status(200).json({ status: 'success', data: user });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -87,10 +83,7 @@ exports.updateChild = asyncHandler (async (req, res) => {
         $set: updatedFields,
       }
     );
-    if (usersChildren === null) {
-      return res.status(404).json({ message: 'Cant find subscriber' });
-    }
-
+    
     return res.status(200).send(usersChildren);
   } catch (err) {
     return res.status(500).json({ message: err.message });
