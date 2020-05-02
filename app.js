@@ -1,22 +1,18 @@
-require('dotenv').config();
-const morganBody = require('morgan-body');
 const express = require('express');
+const morganBody = require('morgan-body');
 const app = express();
-const { check, validationResult } = require('express-validator');
+
+const mongoose = require('mongoose');
+require('dotenv').config();
+const db = mongoose.connection;
 
 const postsRouter = require('./routes/posts');
 const usersRouter = require('./routes/users');
 const childrenRouter = require('./routes/children');
 
-const bodyParser = require('body-parser');
-// app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(bodyParser.json());
 app.use(express.json());
 morganBody(app);
 
-app.use('/posts', postsRouter);
-app.use('/users', usersRouter);
-app.use('/users', childrenRouter);
 
 //*****GENERAL ROUTEES*****
 app.get('/', (req, res) => {
@@ -25,10 +21,10 @@ app.get('/', (req, res) => {
   });
 });
 
-//Catch all routes to serve the index.html file from the client build folder
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../client/build/index.html'));
-// });
+//*****OTHER ROUTEES*****
+app.use('/posts', postsRouter);
+app.use('/users', usersRouter);
+app.use('/users', childrenRouter);
 
 // send 404 if no other route matched
 app.use((req, res) => {
@@ -37,14 +33,11 @@ app.use((req, res) => {
   });
 });
 
-const mongoose = require('mongoose');
 mongoose.set('useUnifiedTopology', true);
-
-const db = mongoose.connection;
 db.on('error', (error) => console.error(error));
 db.once('open', () => console.log('connected to database'));
 
-app.use(express.json());
+
 
 app.use((req, res, next) => {
   res.status(404).send('page not found');
