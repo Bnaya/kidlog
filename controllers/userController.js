@@ -2,16 +2,8 @@ const User = require('../models/user');
 const bcryptjs = require('bcryptjs');
 const { check, validationResult } = require('express-validator');
 const auth = require('basic-auth');
+const { asyncHandler } = require('../asyncHanlder');
 
-function asyncHandler(cb) {
-  return async (req, res, next) => {
-    try {
-      await cb(req, res, next);
-    } catch (err) {
-      next(err);
-    }
-  };
-}
 
 exports.authenicateUser = asyncHandler(async (req, res, next) => {
   let message = null;

@@ -1,16 +1,6 @@
 const User = require('../models/user');
 const { check, validationResult } = require('express-validator');
-
-//Async Handles to retreive data async
-function asyncHandler(cb) {
-  return async (req, res, next) => {
-    try {
-      await cb(req, res, next);
-    } catch (err) {
-      next(err);
-    }
-  };
-}
+const { asyncHandler } = require('../asyncHanlder');
 
 exports.childValidation = [
   check('name')

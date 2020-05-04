@@ -1,18 +1,6 @@
 const Post = require('../models/post');
 const { check, validationResult } = require('express-validator');
-
-//****HELPER FUNCTIONS */
-
-//****ASYCN HANDLER */
-function asyncHandler(cb) {
-  return async (req, res, next) => {
-    try {
-      await cb(req, res, next);
-    } catch (err) {
-      next(err);
-    }
-  };
-}
+const { asyncHandler } = require('../asyncHanlder');
 
 const checkData =  (data, res, req) => {
   if (data === null) {

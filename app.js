@@ -1,4 +1,5 @@
 const express = require('express');
+
 const app = express();
 const morganBody = require('morgan-body');
 
@@ -8,7 +9,6 @@ const childrenRouter = require('./routes/children');
 
 app.use(express.json());
 morganBody(app);
-
 
 //*****GENERAL ROUTEES*****
 app.get('/', (req, res) => {
@@ -24,10 +24,9 @@ app.use('/users', childrenRouter);
 
 // send 404 if no other route matched
 app.use((req, res) => {
- return res.status(404).json({
+  return res.status(404).json({
     message: 'Route Not Found',
   });
 });
-
 
 module.exports = app;
