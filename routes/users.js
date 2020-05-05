@@ -7,9 +7,10 @@ const {
   updateUser,
   getUser,
   getUsers,
-  userValidation,
   userSignin,
 } = require('../controllers/userController');
+
+const { userValidation } = require('../services/validations');
 
 //****ROUTES  */
 

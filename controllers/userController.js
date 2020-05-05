@@ -1,9 +1,8 @@
-const User = require('../models/user');
 const bcryptjs = require('bcryptjs');
-const { check, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const auth = require('basic-auth');
-const { asyncHandler } = require('../asyncHanlder');
-
+const User = require('../models/user');
+const { asyncHandler } = require('../services/asyncHanlder');
 
 exports.authenicateUser = asyncHandler(async (req, res, next) => {
   let message = null;
@@ -40,104 +39,69 @@ exports.authenicateUser = asyncHandler(async (req, res, next) => {
   }
 });
 
-//*****Validations*****
+exports.getUsers = asyncHandler(async (req, res) => {
+  const users = await User.find();
+  return res.send({
+    status: 'success',
+    results: users.length,
+    data: users,
+  });
+});
 
-exports.userValidation = [
-  check('firstName')
-    .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "first name"'),
-  check('lastName')
-    .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "last name"'),
-  check('email')
-    .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "email"')
-    .isEmail()
-    .withMessage('Please provie a valid email address for "email"'),
-  check('password')
-    .exists({ checkNull: true, checkFalsy: true })
-    .isLength({ min: 5 })
-    .withMessage('Please  provide a value for "passowrd'),
-];
-
-
-//**** HANDLERS */ 
-
-exports.getUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    return res.send({
-      status: 'success',
-      results: users.length,
-      data: users,
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+exports.getUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (user === null) {
+    return res.status(404).json({ message: 'Cant find subscriber' });
   }
-};
-
-exports.getUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (user === null) {
-      return res.status(404).json({ message: 'Cant find subscriber' });
-    }
-    res.status(200).send({ status: 'success', data: user });
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-};
+  res.status(200).send({ status: 'success', data: user });
+});
 
 exports.createUser = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
-  const { firstName, lastName, email, password, children } = req.body;
-  const existUser = await User.findOne({ email: email });
   if (!errors.isEmpty()) {
     const errorMessages = errors.array().map((error) => error.msg);
     return res.status(422).json({ errors: errorMessages });
-  } else if (existUser) {
+  }
+  const { firstName, lastName, email, password, children } = req.body;
+  const existUser = await User.findOne({ email: email });
+  if (existUser) {
     return res.status(400).json({ message: 'email address already exists' });
   }
-  try {
-    const hash = await bcryptjs.hash(password, 10);
-    const user = new User({
-      firstName,
-      lastName,
-      email,
-      password: hash,
-      children,
-    });
 
-    const newUser = await user.save();
+  const hash = await bcryptjs.hash(password, 10);
+  const user = new User({
+    firstName,
+    lastName,
+    email,
+    password: hash,
+    children,
+  });
 
-    return res.status(201).send(newUser);
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
+  const newUser = await user.save();
+
+  return res.status(201).send(newUser);
 });
 
-exports.userSignin = async (req, res, next) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(401).json({ message: 'Authentication failed' });
-    }
-    const password = await bcryptjs.compare(req.body.password, user.password);
-    if (!password) {
-      return res.status(401).json({ message: 'Authentication failed' });
-    }
-
-    if (user === null) {
-      return res.status(404).json({ message: 'Cant find subscriber' });
-    }
-    return res.status(200).send(user);
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
+exports.userSignin = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user || !req.body.password) {
+    return res.status(401).json({ message: 'Authentication failed' });
   }
-};
+
+  const password = await bcryptjs.compare(req.body.password, user.password);
+  if (!password) {
+    return res.status(401).json({ message: 'Authentication failed' });
+  }
+
+  return res.status(200).send(user);
+});
 
 exports.updateUser = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const errorMessages = errors.array().map((error) => error.msg);
+    return res.status(400).json({ errors: errorMessages });
+  }
   const { firstName, lastName, email, password } = req.body;
   const emailExist = await User.findOne({
     $and: [{ _id: { $ne: req.params.id } }, { email: email }],
@@ -151,26 +115,20 @@ exports.updateUser = asyncHandler(async (req, res) => {
   if (password) {
     updatedFields.password = hash;
   }
-  if (!errors.isEmpty()) {
-    const errorMessages = errors.array().map((error) => error.msg);
-    return res.status(400).json({ errors: errorMessages });
-  } else if (emailExist) {
+
+  if (emailExist) {
     return res
       .status(400)
       .json({ message: 'email address already exists with other user' });
   }
-  try {
-    const user = await User.updateOne(
-      { _id: req.params.id },
-      {
-        $set: updatedFields,
-      }
-    );
-    if (user === null) {
-      return res.status(404).json({ message: 'Cant find subscriber' });
+
+  await User.updateOne(
+    { _id: req.params.id },
+    {
+      $set: updatedFields,
     }
-    return res.status(200).send(user);
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
+  );
+
+  const updatedUser = await User.findOne({ _id: req.params.id });
+  return res.status(200).send(updatedUser);
 });

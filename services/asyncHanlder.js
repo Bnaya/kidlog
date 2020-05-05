@@ -6,4 +6,4 @@ exports.asyncHandler = (cb) => {
       next(err);
     }
   };
-}
+};

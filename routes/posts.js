@@ -1,7 +1,15 @@
 const express = require('express');
+
 const router = express.Router();
-const authenicateUser = require('../controllers/userController');
-const {getPost, createPost, getPosts, updatePost, deletePost, postValidation } = require('../controllers/postController');
+
+const {
+  getPost,
+  createPost,
+  getPosts,
+  updatePost,
+  deletePost,
+} = require('../controllers/postController');
+const { postValidation } = require('../services/validations');
 //***ROUTES */
 
 //get all posts
