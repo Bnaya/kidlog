@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 const childSchema = new mongoose.Schema(
   {
@@ -12,15 +13,34 @@ const childSchema = new mongoose.Schema(
 
 const userSchema = new mongoose.Schema(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, unique: [true, 'This email exist in our system'] },
-    password: { type: String, required: [true], select: false, unique: true },
+    firstName: {
+      type: String,
+      required: [true, 'Please provide your first name!'],
+    },
+    lastName: {
+      type: String,
+      required: [true, 'Please provide your last name'],
+    },
+    email: {
+      type: String,
+      unique: [true, 'This email exist in our system'],
+      lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email'],
+    },
+    photo: String,
+    password: { type: String, required: [true, 'Please provide a password'], minlength: 8 },
+    passwordConfirm: { type:String, required: [true, 'Please confirm your passowrd']},
 
     children: [childSchema],
   },
   { timestamps: true }
 );
 
-userSchema.plugin(uniqueValidator, { message: 'Email already in use.' });
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
+});
+
 module.exports = mongoose.model('User', userSchema);

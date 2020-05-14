@@ -9,23 +9,19 @@ const {
   getUsers,
   userSignin,
 } = require('../controllers/userController');
-
+const { signup } = require('../controllers/authController');
 const { userValidation } = require('../services/validations');
 
 //****ROUTES  */
+router.post('/signup', signup);
+// router.post('/sign-in', userSignin);
 
-//get all users only for the production
+//Admin routes
 router.get('/', getUsers);
 
 //get a single user for account
 router.get('/:id', getUser);
 
-// create a new user
-router.post('/sign-up', userValidation, createUser);
-
-//user sign-in
-
-router.post('/sign-in', userSignin);
 
 //update a user
 router.patch('/:id', userValidation, updateUser);
