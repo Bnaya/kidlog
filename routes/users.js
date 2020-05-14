@@ -28,6 +28,6 @@ router.post('/sign-up', userValidation, createUser);
 router.post('/sign-in', userSignin);
 
 //update a user
-router.put('/:id', userValidation, updateUser);
+router.patch('/:id', userValidation, updateUser);
 
 module.exports = router;

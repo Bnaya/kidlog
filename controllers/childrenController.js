@@ -31,9 +31,7 @@ exports.createChild = asyncHandler(async (req, res) => {
         children: newChild,
       },
     },
-    {
-      runValidators: true,
-    }
+    { new: true, runValidators: true }
   );
 
   return res.status(200).json({
@@ -70,11 +68,6 @@ exports.deleteChild = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
   const child = user.children.id(req.params.childId);
   child.remove();
-  if (!user || !child) {
-    return next(
-      new AppError(`No child with the ID ${req.params.childId}`, 404)
-    );
-  }
   user.save();
   res.status(204).json({
     status: 'success',
