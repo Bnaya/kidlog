@@ -19,10 +19,10 @@ router.get('/', getPosts);
 router.get('/:id', getPost);
 
 // create a new post
-router.post('/', postValidation, createPost);
+router.post('/',  createPost);
 
 //update a post
-router.put('/:id', postValidation, updatePost);
+router.patch('/:id', updatePost);
 
 //delete a post
 router.delete('/:id', deletePost);

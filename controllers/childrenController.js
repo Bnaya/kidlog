@@ -1,45 +1,48 @@
-const { validationResult } = require('express-validator');
 const User = require('../models/user');
-const { asyncHandler } = require('../services/asyncHanlder');
+const { asyncHandler } = require('../utils/asyncHanlder');
+const AppError = require('../utils/appError');
 
-exports.getChild = asyncHandler(async (req, res) => {
-  const user = await User.findOne({ _id: req.params.id });
+exports.getChild = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
   const child = user.children.id(req.params.childId);
 
   if (!child) {
-    return res.status(404).json({ message: 'Cant find child' });
+    return next(
+      new AppError(`No child with the ID ${req.params.childId}`, 404)
+    );
   }
   return res.status(200).json({ status: 'success', data: child });
 });
 
 exports.createChild = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const errorMessages = errors.array().map((error) => error.msg);
-    return res.status(400).json({ errors: errorMessages });
-  }
   const { name, birthYear, gender } = req.body;
   const newChild = {
-    name: name,
-    birthYear: birthYear,
-    gender: gender,
+    name,
+    birthYear,
+    gender,
   };
 
-  await User.updateOne(
-    { _id: req.params.id },
-    { $push: { children: newChild } }
+  const user = await User.findOneAndUpdate(
+    {
+      _id: req.params.id,
+    },
+    {
+      $push: {
+        children: newChild,
+      },
+    },
+    {
+      runValidators: true,
+    }
   );
 
-  const updatedUser = await User.findOne({ _id: req.params.id });
-  return res.status(200).json({ status: 'success', data: updatedUser });
+  return res.status(200).json({
+    status: 'success',
+    data: user,
+  });
 });
 
-exports.updateChild = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const errorMessages = errors.array().map((error) => error.msg);
-    return res.status(400).json({ errors: errorMessages });
-  }
+exports.updateChild = asyncHandler(async (req, res, next) => {
   const { name, birthYear, gender } = req.body;
   const updatedFields = {
     'children.$.name': name,
@@ -47,21 +50,34 @@ exports.updateChild = asyncHandler(async (req, res) => {
     'children.$.gender': gender,
   };
 
-  await User.updateOne(
+  const user = await User.findOneAndUpdate(
     { 'children._id': req.params.childId },
     {
       $set: updatedFields,
+    },
+    {
+      new: true,
+      runValidators: true,
     }
   );
-  const updatedUser = await User.findOne({ _id: req.params.id });
-  return res.status(200).send(updatedUser);
+  if (!user) {
+    return next(new AppError(`No user with the ID ${req.originalUrl}`, 404));
+  }
+  res.status(200).send(user);
 });
 
-exports.deleteChild = asyncHandler(async (req, res) => {
-  await User.updateOne(
-    { _id: req.params.id },
-    { $pull: { children: { _id: req.params.childId } } }
-  );
-
-  res.status(204).json({ status: 'success', data: null });
+exports.deleteChild = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  const child = user.children.id(req.params.childId);
+  child.remove();
+  if (!user || !child) {
+    return next(
+      new AppError(`No child with the ID ${req.params.childId}`, 404)
+    );
+  }
+  user.save();
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
 });

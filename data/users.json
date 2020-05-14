@@ -1,18 +1,19 @@
-db.users.insertMany([
+[
     {
         
-            "firstName": "Elliot",
-            "lastName": "Jancey",
-       
+        "firstName": "Elliot",
+        "lastName": "Jancey",
         "email": "ejancey0@huffingtonpost.com",
         "password": "NL65A2wXY0l",
         "children": [
-            {   
+            {
+               
                 "gender": "F",
                 "name": "Celisse",
                 "birthYear": 2017
             },
             {
+               
                 "gender": "F",
                 "name": "Carilyn",
                 "birthYear": 2016
@@ -20,24 +21,26 @@ db.users.insertMany([
         ]
     },
     {
-      
-            "firstName": "Garnette",
-            "lastName": "Muckleston",
        
+        "firstName": "Garnette",
+        "lastName": "Muckleston",
         "email": "gmuckleston1@who.int",
         "password": "6YZ3DSkgFa4",
         "children": [
             {
+                
                 "gender": "M",
                 "name": "Tanny",
                 "birthYear": 2015
             },
             {
+                
                 "gender": "M",
                 "name": "Johny",
                 "birthYear": 2014
             },
             {
+               
                 "gender": "F",
                 "name": "Emera",
                 "birthYear": 2017
@@ -45,29 +48,32 @@ db.users.insertMany([
         ]
     },
     {
-      
-            "firstName": "Dareen",
-            "lastName": "Crossfeld"
-        ,
+        
+        "firstName": "Dareen",
+        "lastName": "Crossfeld",
         "email": "dcrossfeld2@weibo.com",
         "password": "i5Kyfo2AliBk",
         "children": [
             {
+               
                 "gender": "M",
                 "name": "Karlan",
                 "birthYear": 2014
             },
             {
+               
                 "gender": "M",
                 "name": "Tull",
                 "birthYear": 2013
             },
             {
+              
                 "gender": "F",
                 "name": "Rianon",
                 "birthYear": 2012
             },
             {
+              
                 "gender": "F",
                 "name": "Katrina",
                 "birthYear": 2017
@@ -75,19 +81,20 @@ db.users.insertMany([
         ]
     },
     {
-        
-            "firstName": "Jeni",
-            "lastName": "Lynde"
-        ,
+       
+        "firstName": "Jeni",
+        "lastName": "Lynde",
         "email": "jlynde3@accuweather.com",
         "password": "MqS3v7W",
         "children": [
             {
+               
                 "gender": "F",
                 "name": "Venus",
                 "birthYear": 2012
             },
             {
+               
                 "gender": "M",
                 "name": "Keen",
                 "birthYear": 2015
@@ -96,32 +103,35 @@ db.users.insertMany([
     },
     {
        
-            "firstName": "Kendre",
-            "lastName": "Croasdale"
-        ,
+        "firstName": "Kendre",
+        "lastName": "Croasdale",
         "email": "kcroasdale4@hc360.com",
         "password": "ymypwNBJU",
         "children": [
             {
+               
                 "gender": "M",
                 "name": "Morty",
                 "birthYear": 2016
             },
             {
+                
                 "gender": "M",
                 "name": "Jermain",
                 "birthYear": 2017
             },
             {
+                
                 "gender": "M",
                 "name": "Moore",
                 "birthYear": 2012
             },
             {
+               
                 "gender": "F",
                 "name": "Rhea",
                 "birthYear": 2013
             }
         ]
     }
-])
+]

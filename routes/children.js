@@ -16,10 +16,10 @@ const { childValidation } = require('../services/validations');
 router.get('/:id/children/:childId', getChild);
 
 //add child  add in the future with session and cookie
-router.post('/:id/children', childValidation, createChild);
+router.post('/:id/children', createChild);
 
 //update child
-router.put('/:id/children/:childId', childValidation, updateChild);
+router.patch('/:id/children/:childId', updateChild);
 
 router.delete('/:id/children/:childId', deleteChild);
 module.exports = router;

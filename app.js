@@ -2,7 +2,8 @@ const express = require('express');
 
 const app = express();
 const morganBody = require('morgan-body');
-
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController.js');
 const postsRouter = require('./routes/posts');
 const usersRouter = require('./routes/users');
 const childrenRouter = require('./routes/children');
@@ -23,10 +24,10 @@ app.use('/users', usersRouter);
 app.use('/users', childrenRouter);
 
 // send 404 if no other route matched
-app.use((req, res) => {
-  return res.status(404).json({
-    message: 'Route Not Found',
-  });
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
+
+app.use(globalErrorHandler);
 
 module.exports = app;

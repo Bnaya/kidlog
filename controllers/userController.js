@@ -1,8 +1,9 @@
 const bcryptjs = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const auth = require('basic-auth');
+const AppError = require('../utils/appError');
 const User = require('../models/user');
-const { asyncHandler } = require('../services/asyncHanlder');
+const { asyncHandler } = require('../utils/asyncHanlder');
 
 exports.authenicateUser = asyncHandler(async (req, res, next) => {
   let message = null;
@@ -48,10 +49,10 @@ exports.getUsers = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getUser = asyncHandler(async (req, res) => {
+exports.getUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
-  if (user === null) {
-    return res.status(404).json({ message: 'Cant find subscriber' });
+  if (!user) {
+    return next(new AppError(`No user with the ID ${req.originalUrl}`, 404));
   }
   res.status(200).send({ status: 'success', data: user });
 });
@@ -69,7 +70,7 @@ exports.createUser = asyncHandler(async (req, res) => {
   }
 
   const hash = await bcryptjs.hash(password, 10);
-  const user = new User({
+  const user = await User.create({
     firstName,
     lastName,
     email,
@@ -77,9 +78,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     children,
   });
 
-  const newUser = await user.save();
-
-  return res.status(201).send(newUser);
+  return res.status(201).send(user);
 });
 
 exports.userSignin = asyncHandler(async (req, res, next) => {
@@ -129,6 +128,6 @@ exports.updateUser = asyncHandler(async (req, res) => {
     }
   );
 
-  const updatedUser = await User.findOne({ _id: req.params.id });
+  const updatedUser = await User.findById(req.params.id);
   return res.status(200).send(updatedUser);
 });

@@ -1,62 +1,72 @@
-db.posts.insertMany([
+[
     {
         "desc": "Integer a nibh. In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet. Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.",
         "lessonNum": 1,
-        "userId": ObjectId("5ea34e83da34935c53fe3356"),
+        "userId": "5eb7f4448d8bfe33e0d7453b",
+        "childId": "5eb7f4448d8bfe33e0d7453c",
         "ratings": 2
     },
     {
         "desc": "Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue. Aliquam erat volutpat. In congue. Etiam justo. Etiam pretium iaculis justo. In hac habitasse platea dictumst. Etiam faucibus cursus urna.",
         "lessonNum": 2,
-        "userId": ObjectId("5ea34e83da34935c53fe3357"),
+        "userId": 2,
+        "childId": 201,
         "ratings": 5
     },
     {
         "desc": "Vivamus tortor. Duis mattis egestas metus. Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh. Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros. Vestibulum ac est lacinia nisi venenatis tristique.",
         "lessonNum": 3,
-        "userId": ObjectId("5ea34e83da34935c53fe3359"),
+        "userId": 3,
+        "childId": 301,
         "ratings": 4
     },
     {
         "desc": "Pellentesque ultrices mattis odio. Donec vitae nisi. Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla.",
         "lessonNum": 4,
-        "userId": ObjectId("5ea34e83da34935c53fe335a"),
+        "userId": 4,
+        "childId": 401,
         "ratings": 4
     },
     {
         "desc": "Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque.",
         "lessonNum": 5,
-        "userId": ObjectId("5ea34e83da34935c53fe3356"),
+        "userId": 5,
+        "childId": 501,
         "ratings": 5
     },
     {
         "desc": "Integer a nibh. In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet. Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.",
         "lessonNum": 1,
-        "userId": ObjectId("5ea34e83da34935c53fe3357"),
+        "userId": 2,
+        "childId": 202,
         "ratings": 1
     },
     {
         "desc": "Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue. Aliquam erat volutpat. In congue. Etiam justo. Etiam pretium iaculis justo. In hac habitasse platea dictumst. Etiam faucibus cursus urna.",
         "lessonNum": 2,
-        "userId": ObjectId("5ea34e83da34935c53fe3358"),
+        "userId": 2,
+        "childId": 201,
         "ratings": 3
     },
     {
         "desc": "Vivamus tortor. Duis mattis egestas metus. Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh. Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros. Vestibulum ac est lacinia nisi venenatis tristique.",
         "lessonNum": 3,
-        "userId": ObjectId("5ea34e83da34935c53fe3357"),
+        "userId": 3,
+        "childId": 303,
         "ratings": 5
     },
     {
         "desc": "Pellentesque ultrices mattis odio. Donec vitae nisi. Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla.",
         "lessonNum": 4,
-        "userId": ObjectId("5ea34e83da34935c53fe3359"),
+        "userId": 3,
+        "childId": 302,
         "ratings": 4
     },
     {
         "desc": "Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque.",
         "lessonNum": 5,
-        "userId": ObjectId("5ea34e83da34935c53fe335a"),
+        "userId": 4,
+        "childId": 401,
         "ratings": 5
     }
-])
+]
