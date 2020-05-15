@@ -13,7 +13,7 @@ const postSchema = new mongoose.Schema(
       max: 1000,
       required: [true, 'Please add a lesson number'],
     },
-    ratings: { type: Number, min: 1, max: 5, default: 5 },
+    difficultyLevel: { type: Number, min: 1, max: 5, default: 5 },
     // userId: { type: Number, required: [true, 'Please add userId'] },
     userId: {
       type: mongoose.Schema.Types.ObjectId,

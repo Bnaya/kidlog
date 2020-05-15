@@ -1,5 +1,5 @@
 const bcryptjs = require('bcryptjs');
-const { validationResult } = require('express-validator');
+// const { validationResult } = require('express-validator');
 const AppError = require('../utils/appError');
 const User = require('../models/user');
 const { asyncHandler } = require('../utils/asyncHanlder');
@@ -23,26 +23,12 @@ exports.getUser = asyncHandler(async (req, res, next) => {
 });
 
 
-// exports.userSignin = asyncHandler(async (req, res, next) => {
-//   const user = await User.findOne({ email: req.body.email });
-//   if (!user || !req.body.password) {
-//     return res.status(401).json({ message: 'Authentication failed' });
-//   }
-
-//   const password = await bcryptjs.compare(req.body.password, user.password);
-//   if (!password) {
-//     return res.status(401).json({ message: 'Authentication failed' });
-//   }
-
-//   return res.status(200).send(user);
-// });
-
 exports.updateUser = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const errorMessages = errors.array().map((error) => error.msg);
-    return res.status(400).json({ errors: errorMessages });
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   const errorMessages = errors.array().map((error) => error.msg);
+  //   return res.status(400).json({ errors: errorMessages });
+  // }
   const { firstName, lastName, email, password } = req.body;
   const emailExist = await User.findOne({
     $and: [{ _id: { $ne: req.params.id } }, { email: email }],

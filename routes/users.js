@@ -3,17 +3,16 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  createUser,
-  updateUser,
+    updateUser,
   getUser,
-  getUsers,
-  userSignin,
+  getUsers
+  
 } = require('../controllers/userController');
-const { signup } = require('../controllers/authController');
-const { userValidation } = require('../services/validations');
+const { signup, signin } = require('../controllers/authController');
 
 //****ROUTES  */
 router.post('/signup', signup);
+router.post('/signin', signin);
 // router.post('/sign-in', userSignin);
 
 //Admin routes
@@ -24,6 +23,6 @@ router.get('/:id', getUser);
 
 
 //update a user
-router.patch('/:id', userValidation, updateUser);
+router.patch('/:id',  updateUser);
 
 module.exports = router;
