@@ -1,5 +1,5 @@
 const express = require('express');
-
+const { protect } = require('./controllers/authController');
 const app = express();
 const morganBody = require('morgan-body');
 const AppError = require('./utils/appError');

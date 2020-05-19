@@ -11,6 +11,15 @@ exports.getPosts = asyncHandler(async (req, res, next) => {
   });
 });
 
+exports.getUserPosts = asyncHandler(async (req, res, next) => {
+  const posts = await Post.find({userId: req.params.userId});
+  return res.json({
+    status: 'success',
+    results: posts.length,
+    data: posts,
+  });
+});
+
 exports.getPost = asyncHandler(async (req, res, next) => {
   const post = await Post.findById(req.params.id);
   if (!post) {
