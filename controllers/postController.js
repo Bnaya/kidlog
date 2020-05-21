@@ -12,7 +12,15 @@ exports.getPosts = asyncHandler(async (req, res, next) => {
 });
 
 exports.getUserPosts = asyncHandler(async (req, res, next) => {
-  const posts = await Post.find({userId: req.params.userId});
+  if (!req.user._id) {
+    return next(
+      new AppError(
+        `You are not authorize to visits these posts ${req.originalUrl}`,
+        403
+      )
+    );
+  }
+  const posts = await Post.find({ userId: req.user._id });
   return res.json({
     status: 'success',
     results: posts.length,
@@ -25,6 +33,15 @@ exports.getPost = asyncHandler(async (req, res, next) => {
   if (!post) {
     return next(new AppError(`No post with the ID ${req.originalUrl}`, 404));
   }
+
+  if (String(post.userId) !== req.user.id) {
+    return next(
+      new AppError(
+        `You are not authorize to visits this posts ${req.originalUrl}`,
+        403
+      )
+    );
+  }
   res.status(200).json({ stats: 'sucess', data: { post } });
 });
 
@@ -34,20 +51,44 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 });
 
 exports.updatePost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+  const post = await Post.findByIdAndUpdate(req.params.id);
+  if (!post) {
+    return next(new AppError(`No post with the ID ${req.originalUrl}`, 404));
+  }
+
+  if (String(post.userId) !== req.user.id) {
+    return next(
+      new AppError(
+        `You are not authorize to edit this post ${req.originalUrl}`,
+        403
+      )
+    );
+  }
+
+  const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
-  if (!post) {
-    return next(new AppError(`No post with the ID ${req.originalUrl}`, 404));
-  }
-  return res.status(200).json({ status: 'success', data: post });
+  return res.status(200).json({ status: 'success', data: updatedPost });
 });
 
 exports.deletePost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findByIdAndDelete(req.params.id);
+  const post = await Post.findById(req.params.id);
   if (!post) {
     return next(new AppError(`No post with the ID ${req.originalUrl}`, 404));
   }
+  if (String(post.userId) !== req.user.id) {
+    return next(
+      new AppError(
+        `You are not authorize to delete this post ${req.originalUrl}`,
+        403
+      )
+    );
+  }
+  post.remove(function (err, item) {
+    if (err)
+      return next(new AppError(`could not proceed deleting ${err}`, 500));
+    console.log(item);
+  });
   res.status(204).json({ status: 'success', data: null });
 });

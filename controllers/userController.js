@@ -1,11 +1,16 @@
-const bcryptjs = require('bcryptjs');
-
-const AppError = require('../utils/appError');
 const User = require('../models/user');
 const { asyncHandler } = require('../utils/asyncHanlder');
+const AppError = require('../utils/appError');
 
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
 
-exports.getUsers = asyncHandler(async (req, res) => {
+exports.getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find();
   return res.send({
     status: 'success',
@@ -22,36 +27,47 @@ exports.getUser = asyncHandler(async (req, res, next) => {
   res.status(200).send({ status: 'success', data: user });
 });
 
-
-exports.updateUser = asyncHandler(async (req, res) => {
- 
-  const { firstName, lastName, email, password } = req.body;
-  const emailExist = await User.findOne({
-    $and: [{ _id: { $ne: req.params.id } }, { email: email }],
+exports.updateMe = asyncHandler(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        'This route is not for password updates, please use /updateMyPassword',
+        400
+      )
+    );
+  }
+  const filteredBody = filterObj(req.body, 'firstName', 'lastName', 'email');
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
   });
-  const hash = await bcryptjs.hash(password, 10);
-  const updatedFields = {
-    firstName,
-    lastName,
-    email,
-  };
-  if (password) {
-    updatedFields.password = hash;
-  }
 
-  if (emailExist) {
-    return res
-      .status(400)
-      .json({ message: 'email address already exists with other user' });
-  }
-
-  await User.updateOne(
-    { _id: req.params.id },
-    {
-      $set: updatedFields,
-    }
-  );
-
-  const updatedUser = await User.findById(req.params.id);
-  return res.status(200).send(updatedUser);
+  res.status(200).json({ status: 'sucess', data: updatedUser });
 });
+
+exports.deleteMe = asyncHandler(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+  res.status(204).json({ status: 'sucess', data: null });
+});
+
+exports.createUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!',
+  });
+};
+exports.updateUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!',
+  });
+};
+
+
+exports.deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not yet defined!',
+  });
+};
+

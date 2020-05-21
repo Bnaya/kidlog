@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -11,6 +12,24 @@ const signToken = (id) => {
   });
 };
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+
+    httpOnly: true,
+  };
+  if (process.env.NODE_END === 'production') cookieOptions.secure = true;
+  res.cookie('jwt', token, cookieOptions);
+  user.password = undefined;
+  res.status(statusCode).json({
+    status: 'sucess',
+    token,
+    data: { user: user },
+  });
+};
 exports.signup = asyncHandler(async (req, res, next) => {
   const newUser = await User.create({
     firstName: req.body.firstName,
@@ -22,13 +41,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(200).json({
-    status: 'sucess',
-    token,
-    data: { user: newUser },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 exports.signin = asyncHandler(async (req, res, next) => {
@@ -45,9 +58,7 @@ exports.signin = asyncHandler(async (req, res, next) => {
   }
 
   //if everything is ok, send token to client
-  const token = signToken(user._id);
-
-  res.status(200).json({ status: 'sucess', token });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = asyncHandler(async (req, res, next) => {
@@ -135,5 +146,45 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   }
 });
 
-exports.resetPassword = (req, res, next) => {};
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+  //get user based on the token
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+  //set the new password only if token is not exipered and there is user
 
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: {
+      $gt: Date.now(),
+    },
+  });
+
+  //update changedPasswordAt property for the user
+  if (!user) {
+    return next(new AppError('Token is invalid or has expired', 400));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+  //log the user in, send JWT
+  createSendToken(user, 201, res);
+});
+
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select('+password');
+
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong.', 401));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  createSendToken(user, 200, res);
+});
