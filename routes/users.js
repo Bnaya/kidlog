@@ -7,7 +7,7 @@ const {
   getUser,
   getAllUsers,
   updateMe,
-  deleteMe
+  deleteMe,
 } = require('../controllers/userController');
 
 const {
@@ -37,7 +37,6 @@ router.get('/', getAllUsers);
 
 //get a single user for account
 router.get('/:id', getUser);
-
 
 // router.patch('/:id', updateUser);
 

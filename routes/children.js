@@ -8,8 +8,6 @@ const {
   deleteChild,
 } = require('../controllers/childrenController');
 
-const { childValidation } = require('../services/validations');
-
 //*****ROUTES*****
 
 //get child
