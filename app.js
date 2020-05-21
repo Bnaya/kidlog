@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController.js');
 const postsRouter = require('./routes/posts');
@@ -38,6 +39,20 @@ app.use(mongoSanitize());
 
 //Data sanitization against XSS
 app.use(xss());
+
+//Prevent parameter pollution
+app.use(
+  hpp()
+  // put this inside the app function{
+  // whitelist: [
+  //   'createdAt',
+  //   'tags',
+  //   'child',
+  //   'difficlutyLevel',
+  //
+  // ]
+  // }
+);
 
 //CORS support cross-origin resource sharing or CORS
 // app.use(cors());
