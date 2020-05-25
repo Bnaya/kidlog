@@ -8,6 +8,11 @@ const childSchema = new mongoose.Schema(
     name: { type: String, required: true },
     birthYear: { type: Number, required: true },
     gender: { type: String, required: true },
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
   },
   { timestamps: true }
 );
@@ -78,13 +83,16 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// userSchema.pre(/^find/, async function (next) {
+//   //this points to the current query
+//   this.find({ active: { $ne: false } });
+//   next();
+// });
 
-userSchema.pre(/^find/, async function (next) {
-  //this points to the current query
-  this.find({ active: { $ne: false } });
-  next();
-});
-
+// childSchema.pre(/^find/, async function (next) {
+//   this.find({ active: { $ne: false } });
+//   next();
+// });
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword

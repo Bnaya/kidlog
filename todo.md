@@ -1,17 +1,22 @@
-TODO fix sign-up user with 400 message node:15416) UnhandledPromiseRejectionWarning: Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
 
-TODO 1. user authentication
+API Todos
 
-TODO 2. routes authorization
+TODO routes checkAuthorization 403 function and implement on the relevant routes (posts, children)
 
-TODO 3. JWT via Cookie
+TODO Check all routes if they need restrictTo or protect middleware
 
-TODO 4. mongoDB from local machine to mongo atlas
+TODO Create myAccout user on GET route to see user's account
 
-TODO 5. Updload image photos
+TODO create myChildren GET account to see all childrenRouter
 
-TODO 6. Upload image videos
+TODO update removeChild DELETE route by the user with adding property active: false to child
 
-TODO 7. authentication with gmail
+TODO Create aggregation on mongoDB for lessons categories, child, and ascending posts
 
-TODO
+TODO Updload image photos
+
+TODO Upload image videos
+
+TODO authentication with gmail
+
+TODO Before deploynment change the fake mail on authentication to sendgrid 

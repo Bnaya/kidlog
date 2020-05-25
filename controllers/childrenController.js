@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const Post = require('../models/post');
+
 const { asyncHandler } = require('../utils/asyncHanlder');
 const AppError = require('../utils/appError');
 
@@ -66,20 +66,13 @@ exports.updateChild = asyncHandler(async (req, res, next) => {
 });
 
 exports.deleteChild = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
-  const child = user.children.id(req.params.childId);
-  child.remove();
-  user.save();
-  //ADD DELETE ALL POSTS WITH DELETED CHILD
-  //THIS IS PROBLEMATIC
-//   UNHANDLED REJECTION! �💥 Shutting down.
-// ValidationError User validation failed: passwordConfirm: Please confirm your passowrd
-  // await Post.deleteMany({ childId: req.params.childId });
-  
-  // if (!posts) {
-  //   return next(new AppError(`No posts with the childId ${req.params.chilId}`, 400));
-  // }
-  res.status(204).json({
+   await User.findOneAndUpdate(
+    { 'children._id': req.params.childId },
+    {
+      $set: { active: false },
+    }
+  );
+    res.status(204).json({
     status: 'success',
     data: null,
   });

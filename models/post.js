@@ -22,7 +22,7 @@ const postSchema = new mongoose.Schema(
     },
     // childId: { type: Number, required: [true, 'Please add childId'] },
     childId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'Child',
       required: [true, 'Please add a child Id'],
     },
@@ -32,5 +32,10 @@ const postSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+postSchema.pre(/^find/, function (next) {
+  this.populate({ path: 'userId' });
+  next();
+});
 
 module.exports = mongoose.model('Post', postSchema);
