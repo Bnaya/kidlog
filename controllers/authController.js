@@ -105,6 +105,7 @@ exports.restrictTo = (...roles) => {
   };
 };
 
+
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });

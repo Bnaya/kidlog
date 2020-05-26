@@ -21,7 +21,7 @@ exports.getUserPosts = asyncHandler(async (req, res, next) => {
     );
   }
   const posts = await Post.find({ userId: req.user._id });
-  console.log(req.user)
+  
   return res.json({
     status: 'success',
     results: posts.length,

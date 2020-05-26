@@ -14,7 +14,7 @@ const {
   signup,
   signin,
   protect,
-  // restrictTo,
+  restrictTo,
   forgotPassword,
   resetPassword,
   updatePassword,
@@ -29,13 +29,11 @@ router.patch('/resetPassword/:token', resetPassword);
 
 router.patch('/updateMyPassword', protect, updatePassword);
 
+router.get('/:id', protect, getUser);
 router.patch('/updateMe', protect, updateMe);
 router.delete('/deleteMe', protect, deleteMe);
 
 //Admin routes Don't forger to put restictTo and protect in production
-router.get('/', getAllUsers);
-
-//get a single user for account only for admin restrict in production
-router.get('/:id', getUser);
+router.get('/', protect, restrictTo('admin'), getAllUsers);
 
 module.exports = router;

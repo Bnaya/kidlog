@@ -11,7 +11,6 @@ const childSchema = new mongoose.Schema(
     active: {
       type: Boolean,
       default: true,
-      select: false,
     },
   },
   { timestamps: true }
@@ -63,7 +62,7 @@ const userSchema = new mongoose.Schema(
     active: {
       type: Boolean,
       default: true,
-      select: false,
+      // select: false,
     },
   },
 
@@ -83,16 +82,20 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre(/^find/, async function (next) {
+  //this points to the current query
+   this.find({ active: { $ne: false } });
+  next();
+});
+userSchema.pre('init', function (doc) {
+  doc.children = doc.children.filter((c) => c.active);
+});
 // userSchema.pre(/^find/, async function (next) {
 //   //this points to the current query
-//   this.find({ active: { $ne: false } });
+//   this.find({ "children.active": { $ne: false } });
 //   next();
 // });
 
-// childSchema.pre(/^find/, async function (next) {
-//   this.find({ active: { $ne: false } });
-//   next();
-// });
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword

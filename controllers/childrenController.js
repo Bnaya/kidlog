@@ -12,6 +12,19 @@ exports.getChild = asyncHandler(async (req, res, next) => {
       new AppError(`No child with the ID ${req.params.childId}`, 404)
     );
   }
+
+  if (child.active === false) {
+    return next(new AppError('This child have been cancelled', 400));
+  }
+
+  if (String(user._id) !== req.user.id) {
+    return next(
+      new AppError(
+        `You are not authorize to visits this page ${req.originalUrl}`,
+        403
+      )
+    );
+  }
   return res.status(200).json({ status: 'success', data: child });
 });
 
@@ -48,8 +61,38 @@ exports.updateChild = asyncHandler(async (req, res, next) => {
     'children.$.birthYear': birthYear,
     'children.$.gender': gender,
   };
+  const user = await User.findById(req.user.id);
+  const child = user.children.id(req.params.childId);
 
-  const user = await User.findOneAndUpdate(
+  if (!child) {
+    return next(
+      new AppError(`No child with the ID ${req.params.childId}`, 404)
+    );
+  }
+
+  if (child.active === false) {
+    return next(
+      new AppError(
+        'This child have been cancelled, please connect the administrator',
+        400
+      )
+    );
+  }
+
+  if (!user) {
+    return next(new AppError(`No user with the ID ${req.originalUrl}`, 404));
+  }
+
+  if (String(user._id) !== req.user.id) {
+    return next(
+      new AppError(
+        `You are not authorize to visits this page ${req.originalUrl}`,
+        403
+      )
+    );
+  }
+
+  const updatedUser = await User.findOneAndUpdate(
     { 'children._id': req.params.childId },
     {
       $set: updatedFields,
@@ -59,20 +102,28 @@ exports.updateChild = asyncHandler(async (req, res, next) => {
       runValidators: true,
     }
   );
-  if (!user) {
-    return next(new AppError(`No user with the ID ${req.originalUrl}`, 404));
-  }
-  res.status(200).send(user);
+  res.status(200).send(updatedUser);
 });
 
 exports.deleteChild = asyncHandler(async (req, res, next) => {
-   await User.findOneAndUpdate(
+  const user = await User.findOneAndUpdate(
     { 'children._id': req.params.childId },
     {
       $set: { active: false },
     }
   );
-    res.status(204).json({
+  if (!user) {
+    return next(new AppError(`No user with the ID ${req.originalUrl}`, 404));
+  }
+  if (String(user._id) !== req.user.id) {
+    return next(
+      new AppError(
+        `You are not authorize to visits this page ${req.originalUrl}`,
+        403
+      )
+    );
+  }
+  res.status(204).json({
     status: 'success',
     data: null,
   });

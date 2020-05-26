@@ -3,13 +3,8 @@ API Todos
 
 TODO routes checkAuthorization 403 function and implement on the relevant routes (posts, children)
 
-TODO Check all routes if they need restrictTo or protect middleware
 
-TODO Create myAccout user on GET route to see user's account
-
-TODO create myChildren GET account to see all childrenRouter
-
-TODO update removeChild DELETE route by the user with adding property active: false to child
+TODO create lesson schema and update posts with it ObjectId
 
 TODO Create aggregation on mongoDB for lessons categories, child, and ascending posts
 

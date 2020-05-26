@@ -20,9 +20,19 @@ exports.getAllUsers = asyncHandler(async (req, res) => {
 });
 
 exports.getUser = asyncHandler(async (req, res, next) => {
+ 
   const user = await User.findById(req.params.id);
   if (!user) {
     return next(new AppError(`No user with the ID ${req.originalUrl}`, 404));
+  }
+
+  if (String(user._id) !== req.user.id) {
+    return next(
+      new AppError(
+        `You are not authorize to visits this page ${req.originalUrl}`,
+        403
+      )
+    );
   }
   res.status(200).send({ status: 'success', data: user });
 });
