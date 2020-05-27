@@ -84,17 +84,12 @@ userSchema.pre('save', async function (next) {
 
 userSchema.pre(/^find/, async function (next) {
   //this points to the current query
-   this.find({ active: { $ne: false } });
+  this.find({ active: { $ne: false } });
   next();
 });
 userSchema.pre('init', function (doc) {
   doc.children = doc.children.filter((c) => c.active);
 });
-// userSchema.pre(/^find/, async function (next) {
-//   //this points to the current query
-//   this.find({ "children.active": { $ne: false } });
-//   next();
-// });
 
 userSchema.methods.correctPassword = async function (
   candidatePassword,

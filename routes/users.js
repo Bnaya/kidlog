@@ -1,5 +1,5 @@
 const express = require('express');
-
+const childrenRouter = require('./children');
 const router = express.Router();
 
 const {
@@ -21,6 +21,10 @@ const {
 } = require('../controllers/authController');
 
 //****ROUTES  */
+
+router.use('/:id/children/', childrenRouter);
+//Authentication ROUTES
+
 router.post('/signup', signup);
 router.post('/signin', signin);
 
@@ -29,6 +33,7 @@ router.patch('/resetPassword/:token', resetPassword);
 
 router.patch('/updateMyPassword', protect, updatePassword);
 
+//User Routes
 router.get('/:id', protect, getUser);
 router.patch('/updateMe', protect, updateMe);
 router.delete('/deleteMe', protect, deleteMe);

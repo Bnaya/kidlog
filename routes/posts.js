@@ -17,8 +17,7 @@ const {
 //ADMIN ROUTES
 //in the meantime we use protect method with token, but we need an admin protect method here
 // router.get('/', protect, restrictTo('admin'), getPosts);
- router.get('/',  getPosts);
-
+router.get('/', restrictTo('admin'), getPosts);
 
 //USER ROUTES
 //get all user posts posts

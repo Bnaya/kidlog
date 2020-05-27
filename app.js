@@ -70,7 +70,6 @@ app.get('/', (req, res) => {
 //*****OTHER ROUTEES*****
 app.use('/posts', postsRouter);
 app.use('/users', usersRouter);
-app.use('/users', childrenRouter);
 
 // send 404 if no other route matched
 app.all('*', (req, res, next) => {

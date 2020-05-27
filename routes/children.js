@@ -1,6 +1,6 @@
 const express = require('express');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const {
   getChild,
   createChild,
@@ -12,13 +12,13 @@ const { protect } = require('../controllers/authController');
 //*****ROUTES*****
 
 //get child
-router.get('/:id/children/:childId', protect, getChild);
+router.get('/:childId', protect, getChild);
 
 //add child  add in the future with session and cookie
-router.post('/:id/children', protect, createChild);
+router.post('/', protect, createChild);
 
 //update child
-router.patch('/:id/children/:childId', protect, updateChild);
+router.patch('/:childId', protect, updateChild);
 
-router.delete('/:id/children/:childId', protect, deleteChild);
+router.delete('/:childId', protect, deleteChild);
 module.exports = router;
