@@ -10,15 +10,15 @@ const {
 const { protect } = require('../controllers/authController');
 
 //*****ROUTES*****
-
+router.use(protect);
 //get child
-router.get('/:childId', protect, getChild);
+router.get('/:childId', getChild);
 
 //add child  add in the future with session and cookie
-router.post('/', protect, createChild);
+router.post('/', createChild);
 
 //update child
-router.patch('/:childId', protect, updateChild);
+router.patch('/:childId', updateChild);
 
-router.delete('/:childId', protect, deleteChild);
+router.delete('/:childId', deleteChild);
 module.exports = router;

@@ -1,5 +1,6 @@
 const express = require('express');
 const childrenRouter = require('./children');
+
 const router = express.Router();
 
 const {
@@ -8,6 +9,7 @@ const {
   getAllUsers,
   updateMe,
   deleteMe,
+  getMe,
 } = require('../controllers/userController');
 
 const {
@@ -31,14 +33,16 @@ router.post('/signin', signin);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
 
-router.patch('/updateMyPassword', protect, updatePassword);
-
 //User Routes
-router.get('/:id', protect, getUser);
-router.patch('/updateMe', protect, updateMe);
-router.delete('/deleteMe', protect, deleteMe);
+router.use(protect);
+
+router.get('/me', getMe, getUser);
+router.patch('/updateMe', updateMe);
+router.patch('/updateMyPassword', updatePassword);
+router.delete('/deleteMe', deleteMe);
 
 //Admin routes Don't forger to put restictTo and protect in production
-router.get('/', protect, restrictTo('admin'), getAllUsers);
+router.get('/:id', getUser);
+router.get('/', restrictTo('admin'), getAllUsers);
 
 module.exports = router;

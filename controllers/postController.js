@@ -21,7 +21,7 @@ exports.getUserPosts = asyncHandler(async (req, res, next) => {
     );
   }
   const posts = await Post.find({ userId: req.user._id });
-  
+
   return res.json({
     status: 'success',
     results: posts.length,
@@ -52,7 +52,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 });
 
 exports.updatePost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findByIdAndUpdate(req.params.id);
+  const post = await Post.findById(req.params.id);
   if (!post) {
     return next(new AppError(`No post with the ID ${req.originalUrl}`, 404));
   }

@@ -14,25 +14,23 @@ const {
 
 //***ROUTES */
 
-//ADMIN ROUTES
-//in the meantime we use protect method with token, but we need an admin protect method here
-// router.get('/', protect, restrictTo('admin'), getPosts);
-router.get('/', restrictTo('admin'), getPosts);
-
 //USER ROUTES
+router.use(protect);
 //get all user posts posts
-router.get('/myposts', protect, getUserPosts);
+router.get('/myposts', getUserPosts);
 
 //get a single post
-router.get('/:id', protect, getPost);
+router.get('/:id', getPost);
 
 // create a new post
-router.post('/', protect, createPost);
+router.post('/', createPost);
 
 //update a post
-router.patch('/:id', protect, updatePost);
+router.patch('/:id', updatePost);
 
 //delete a post
-router.delete('/:id', protect, deletePost);
+router.delete('/:id', deletePost);
+
+router.get('/', restrictTo('admin'), getPosts);
 
 module.exports = router;

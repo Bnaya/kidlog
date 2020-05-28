@@ -6,7 +6,9 @@ TODO routes checkAuthorization 403 function and implement on the relevant routes
 
 TODO create lesson schema and update posts with it ObjectId
 
-TODO Create aggregation on mongoDB for lessons categories, child, and ascending posts
+TODO Refactor 403, 404 in 
+
+TODO Create aggregation on mongoDB for lessons categories, child, and ascending posts maybe to do fileter with API Feature (check course)
 
 TODO Updload image photos
 
