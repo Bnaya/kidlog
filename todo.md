@@ -8,6 +8,8 @@ TODO create lesson schema and update posts with it ObjectId
 
 TODO Refactor 403, 404 in 
 
+TODO git ignore arease config.env and postman folder from history
+
 TODO Create aggregation on mongoDB for lessons categories, child, and ascending posts maybe to do fileter with API Feature (check course)
 
 TODO Updload image photos
