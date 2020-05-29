@@ -4,8 +4,6 @@ API Todos
 TODO routes checkAuthorization 403 function and implement on the relevant routes (posts, children)
 
 
-TODO create lesson schema and update posts with it ObjectId
-
 TODO Refactor 403, 404 in 
 
 TODO git ignore arease config.env and postman folder from history

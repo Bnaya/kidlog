@@ -1,4 +1,5 @@
 const Post = require('../models/post');
+const Lesson = require('../models/lesson');
 const AppError = require('../utils/appError');
 const { asyncHandler } = require('../utils/asyncHanlder');
 
@@ -35,7 +36,7 @@ exports.getPost = asyncHandler(async (req, res, next) => {
     return next(new AppError(`No post with the ID ${req.originalUrl}`, 404));
   }
 
-  if (String(post.userId) !== req.user.id) {
+  if (String(post.userId._id) !== req.user.id) {
     return next(
       new AppError(
         `You are not authorize to visits this posts ${req.originalUrl}`,
@@ -47,7 +48,17 @@ exports.getPost = asyncHandler(async (req, res, next) => {
 });
 
 exports.createPost = asyncHandler(async (req, res, next) => {
-  const post = await Post.create(req.body);
+  const { desc, childId, ratings } = req.body;
+  const userId = req.user.id;
+  const lesson = await Lesson.findOne({ lessonNum: req.body.lessonNum });
+  const newPost = {
+    desc,
+    lessonId: lesson._id,
+    userId,
+    childId,
+    ratings,
+  };
+  const post = await Post.create(newPost);
   return res.status(201).json({ status: 'success', data: post });
 });
 
@@ -57,7 +68,7 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
     return next(new AppError(`No post with the ID ${req.originalUrl}`, 404));
   }
 
-  if (String(post.userId) !== req.user.id) {
+  if (String(post.userId._id) !== req.user.id) {
     return next(
       new AppError(
         `You are not authorize to edit this post ${req.originalUrl}`,
@@ -66,6 +77,8 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
     );
   }
 
+  const lesson = await Lesson.findOne({ lessonNum: req.body.lessonNum });
+    if (req.body.lessonNum) req.body.lessonId = lesson.id;
   const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -78,7 +91,7 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
   if (!post) {
     return next(new AppError(`No post with the ID ${req.originalUrl}`, 404));
   }
-  if (String(post.userId) !== req.user.id) {
+  if (String(post.userId._id) !== req.user.id) {
     return next(
       new AppError(
         `You are not authorize to delete this post ${req.originalUrl}`,
